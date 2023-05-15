@@ -13,20 +13,20 @@ import {
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { signOut } from "../../store/reducers/logged";
-import { fetch } from "../../store/reducers/controls";
+import { fetchCategories } from "../../store/reducers/category";
 import { api } from "../../services/api";
 
-export const Controls = () => {
+export const Categories = () => {
   const dispatch = useDispatch();
-  const controls = useSelector((state) => state.controls);
+  const categories = useSelector((state) => state.categories);
 
-  const findControls = async (opened) => {
+  const findCategories = async () => {
     api.defaults.headers.common.Authorization = localStorage.getItem("token");
 
     await api
-      .get(`control/opened=${opened}`)
+      .get(`category?orderBy=idcategory`)
       .then((res) => {
-        dispatch(fetch({ payload: res.data }));
+        dispatch(fetchCategories({ payload: res.data }));
         return res.data;
       })
       .catch((err) => {
@@ -35,31 +35,29 @@ export const Controls = () => {
   };
 
   useEffect(() => {
-    findControls(true);
+    findCategories();
   }, []);
 
   return (
     <Flex flexDir={"column"}>
-      <Heading mb={8}> Comandas </Heading>
+      <Heading mb={8}> Categorias </Heading>
       <TableContainer>
         <Table>
-          <TableCaption> Comandas </TableCaption>
+          <TableCaption> Categorias </TableCaption>
           <Thead>
             <Tr>
               <Th isNumeric>Id</Th>
-              <Th>Cliente</Th>
-              <Th>Garçom</Th>
-              <Th isNumeric>Número</Th>
+              <Th>Categoria</Th>
+              <Th>Descrição</Th>
             </Tr>
           </Thead>
-          {controls.payload ? (
+          {categories.payload ? (
             <Tbody>
-              {controls.payload.content.map((control) => (
+              {categories.payload.content.map((category) => (
                 <Tr>
-                  <Td>{control.idcontrol}</Td>
-                  <Td>{control.client}</Td>
-                  <Td>{control.waiter}</Td>
-                  <Td>{control.controlnumber}</Td>
+                  <Td>{category.idcategory}</Td>
+                  <Td>{category.category}</Td>
+                  <Td>{category.description}</Td>
                 </Tr>
               ))}
             </Tbody>

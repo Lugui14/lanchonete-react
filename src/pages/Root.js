@@ -1,9 +1,10 @@
-import { Flex, Heading } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { Sidebar } from "../components/SidebarComponents/Sidebar";
 import { LoginForm } from "../components/Forms/LoginForm";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { isLoginValid } from "../store/reducers/logged";
+import { Outlet } from "react-router-dom";
 
 export const Root = () => {
   const isLogged = useSelector((state) => state.logged);
@@ -24,7 +25,7 @@ export const Root = () => {
             alignItems={"center"}
             justifyContent={"center"}
           >
-            <Heading> Seja Bem Vindo </Heading>
+            <Outlet />
           </Flex>
         </Flex>
       ) : (

@@ -3,7 +3,11 @@ import React from "react";
 import { Button, Flex, Heading } from "@chakra-ui/react";
 import { SidebarButton } from "./SidebarButton";
 
-import { CiCircleAlert } from "react-icons/ci";
+import { BsReverseLayoutTextSidebarReverse } from "react-icons/bs";
+import { MdFastfood } from "react-icons/md";
+import { BiCategoryAlt } from "react-icons/bi";
+import { IoPersonOutline } from "react-icons/io5";
+import { AiOutlineBell } from "react-icons/ai";
 import { useDispatch } from "react-redux";
 import { signOut } from "../../store/reducers/logged";
 import { logout } from "../../services/auth";
@@ -34,39 +38,29 @@ export const Sidebar = () => {
 
         <Flex flexDir={"column"}>
           <SidebarButton
-            button={"Menu 1"}
-            link={"/"}
-            icon={<CiCircleAlert />}
+            button={"Comandas"}
+            link={"/controls"}
+            icon={<BsReverseLayoutTextSidebarReverse />}
           />
           <SidebarButton
-            button={"Menu 2"}
-            link={"/"}
-            icon={<CiCircleAlert />}
+            button={"Produtos"}
+            link={"/products"}
+            icon={<MdFastfood />}
           />
           <SidebarButton
-            button={"Menu 3"}
-            link={"/"}
-            icon={<CiCircleAlert />}
+            button={"Categorias"}
+            link={"/categories"}
+            icon={<BiCategoryAlt />}
           />
           <SidebarButton
-            button={"Menu 4"}
-            link={"/"}
-            icon={<CiCircleAlert />}
+            button={"Garçons"}
+            link={"/waiters"}
+            icon={<IoPersonOutline />}
           />
           <SidebarButton
-            button={"Menu 5"}
-            link={"/"}
-            icon={<CiCircleAlert />}
-          />
-          <SidebarButton
-            button={"Menu 6"}
-            link={"/"}
-            icon={<CiCircleAlert />}
-          />
-          <SidebarButton
-            button={"Menu 7"}
-            link={"/"}
-            icon={<CiCircleAlert />}
+            button={"Pedidos"}
+            link={"/requests"}
+            icon={<AiOutlineBell />}
           />
         </Flex>
       </Flex>

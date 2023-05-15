@@ -13,20 +13,20 @@ import {
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { signOut } from "../../store/reducers/logged";
-import { fetch } from "../../store/reducers/controls";
+import { fetchWaiters } from "../../store/reducers/waiters";
 import { api } from "../../services/api";
 
-export const Controls = () => {
+export const Waiters = () => {
   const dispatch = useDispatch();
-  const controls = useSelector((state) => state.controls);
+  const waiters = useSelector((state) => state.waiters);
 
-  const findControls = async (opened) => {
+  const findWaiters = async () => {
     api.defaults.headers.common.Authorization = localStorage.getItem("token");
 
     await api
-      .get(`control/opened=${opened}`)
+      .get(`waiter`)
       .then((res) => {
-        dispatch(fetch({ payload: res.data }));
+        dispatch(fetchWaiters({ payload: res.data }));
         return res.data;
       })
       .catch((err) => {
@@ -35,31 +35,29 @@ export const Controls = () => {
   };
 
   useEffect(() => {
-    findControls(true);
+    findWaiters();
   }, []);
 
   return (
     <Flex flexDir={"column"}>
-      <Heading mb={8}> Comandas </Heading>
+      <Heading mb={8}> Garçons </Heading>
       <TableContainer>
         <Table>
-          <TableCaption> Comandas </TableCaption>
+          <TableCaption> Garçons </TableCaption>
           <Thead>
             <Tr>
               <Th isNumeric>Id</Th>
-              <Th>Cliente</Th>
-              <Th>Garçom</Th>
-              <Th isNumeric>Número</Th>
+              <Th>Nome</Th>
+              <Th isNumeric>Salario</Th>
             </Tr>
           </Thead>
-          {controls.payload ? (
+          {waiters.payload ? (
             <Tbody>
-              {controls.payload.content.map((control) => (
+              {waiters.payload.content.map((waiter) => (
                 <Tr>
-                  <Td>{control.idcontrol}</Td>
-                  <Td>{control.client}</Td>
-                  <Td>{control.waiter}</Td>
-                  <Td>{control.controlnumber}</Td>
+                  <Td>{waiter.idwaiter}</Td>
+                  <Td>{waiter.waiter}</Td>
+                  <Td>{waiter.salary}</Td>
                 </Tr>
               ))}
             </Tbody>

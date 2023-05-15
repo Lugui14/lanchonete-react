@@ -1,22 +1,23 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
 
-import { ChakraProvider } from '@chakra-ui/react';
-import { RouterProvider } from 'react-router-dom';
-import { Provider } from 'react-redux';
+import { ChakraProvider } from "@chakra-ui/react";
+import { Provider } from "react-redux";
 
-import router from './routes';
-import store from './store';
+import { Router } from "./routes";
+import store from "./store";
+import { BrowserRouter } from "react-router-dom";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Provider store={store}>   
+    <Provider store={store}>
       <ChakraProvider>
-        <RouterProvider router={router} />
+        <BrowserRouter>
+          <Router />
+        </BrowserRouter>
       </ChakraProvider>
     </Provider>
   </React.StrictMode>
 );
-
