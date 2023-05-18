@@ -8,7 +8,7 @@ export const login = async ({ login, password }) => {
     })
     .then((res) => {
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem("loginValidTime", Date.now() + 7200000);
+      localStorage.setItem("loginValidTime", Date.now() + 3600000);
 
       api.defaults.headers.common.Authorization = res.data.token;
 
