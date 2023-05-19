@@ -11,6 +11,8 @@ import {
   Td,
   Tbody,
   Text,
+  Select,
+  useToast,
 } from "@chakra-ui/react";
 
 import {
@@ -30,11 +32,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { signOut } from "../../store/reducers/logged";
 import { fetchRequests } from "../../store/reducers/requests";
 import { api } from "../../services/api";
+import { CreateRequest } from "../../components/Forms/CreateRequest";
 
 export const Requests = () => {
   const dispatch = useDispatch();
+  const toast = useToast();
   const requests = useSelector((state) => state.requests);
   const [total, setTotal] = useState(18);
+  const [updates, setUpdates] = useState(0);
   const PAGESIZE = 6;
 
   const STATUSPEDIDOS = ["Pedido", "Preparando", "Pronto", "Pago", "Cancelado"];
@@ -75,9 +80,56 @@ export const Requests = () => {
       });
   };
 
+  const handleRequestStatusChange = async (idrequest, status) => {
+    status !== 4
+      ? api
+          .put("request", {
+            idrequest,
+            requeststatus: status,
+          })
+          .then((res) => {
+            toast({
+              title: "Status Atualizado",
+              description: "Status do pedido atualizado com sucesso",
+              status: "success",
+              duration: 5000,
+              isClosable: true,
+            });
+          })
+          .catch((err) => {
+            toast({
+              title: "Erro",
+              description: "Erro na atualização do pedido",
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+            });
+          })
+      : api
+          .delete(`request/${idrequest}`)
+          .then((res) => {
+            toast({
+              title: "Pedido cancelado",
+              description: "Pedido cancelado com sucesso",
+              status: "success",
+              duration: 5000,
+              isClosable: true,
+            });
+          })
+          .catch((err) => {
+            toast({
+              title: "Erro",
+              description: "Erro no cancelamento do pedido",
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+            });
+          });
+  };
+
   useEffect(() => {
     findRequests(currentPage - 1);
-  }, [currentPage, pageSize, offset]);
+  }, [currentPage, pageSize, offset, updates]);
 
   // handlers
   const handlePageChange = (nextPage) => {
@@ -90,10 +142,17 @@ export const Requests = () => {
 
   return (
     <Flex flexDir={"column"} minW={"60%"}>
-      <Heading mb={8}> Requests </Heading>
+      <Flex justifyContent={"space-between"}>
+        <Heading mb={8}> Pedidos </Heading>
+        <CreateRequest
+          idcontrol={null}
+          requestUpdate={updates}
+          setRequestUpdate={setUpdates}
+        />
+      </Flex>
       <TableContainer>
         <Table>
-          <TableCaption> Requests </TableCaption>
+          <TableCaption> Pedidos </TableCaption>
           <Thead>
             <Tr>
               <Th>Id</Th>
@@ -109,7 +168,37 @@ export const Requests = () => {
                 <Tr>
                   <Td>{request.idrequest}</Td>
                   <Td>{request.product}</Td>
-                  <Td>{STATUSPEDIDOS[request.requeststatus]}</Td>
+                  <Td>
+                    <Select
+                      w={36}
+                      onChange={(event) => {
+                        handleRequestStatusChange(
+                          request.idrequest,
+                          event.target.value
+                        );
+                      }}
+                    >
+                      {STATUSPEDIDOS.map((statuspedido) => {
+                        return STATUSPEDIDOS.indexOf(statuspedido) ===
+                          request.requeststatus ? (
+                          <option
+                            key={STATUSPEDIDOS.indexOf(statuspedido)}
+                            value={STATUSPEDIDOS.indexOf(statuspedido)}
+                            selected
+                          >
+                            {statuspedido}
+                          </option>
+                        ) : (
+                          <option
+                            key={STATUSPEDIDOS.indexOf(statuspedido)}
+                            value={STATUSPEDIDOS.indexOf(statuspedido)}
+                          >
+                            {statuspedido}
+                          </option>
+                        );
+                      })}
+                    </Select>
+                  </Td>
                   <Td isNumeric>{request.vlvenda}</Td>
                   <Td isNumeric>{request.controlnumber}</Td>
                 </Tr>

@@ -11,6 +11,10 @@ import {
   Td,
   Tbody,
   Text,
+  MenuList,
+  MenuItem,
+  Link,
+  Select,
 } from "@chakra-ui/react";
 
 import {
@@ -30,11 +34,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { signOut } from "../../store/reducers/logged";
 import { fetchProducts } from "../../store/reducers/products";
 import { api } from "../../services/api";
+import { CreateProduct } from "../../components/Forms/CreateProduct";
 
 export const Products = () => {
   const dispatch = useDispatch();
   const products = useSelector((state) => state.products);
   const [total, setTotal] = useState(18);
+  const [updates, setUpdates] = useState(0);
+  const [productactive, setProductactive] = useState(true);
 
   const PAGESIZE = 6;
 
@@ -60,11 +67,13 @@ export const Products = () => {
     },
   });
 
-  const findProducts = async (page) => {
+  const findProducts = async (isactive, page) => {
     api.defaults.headers.common.Authorization = localStorage.getItem("token");
 
     await api
-      .get(`product?size=${PAGESIZE}&sort=idproduct,asc&page=${page}`)
+      .get(
+        `product/isactive=${isactive}?size=${PAGESIZE}&sort=idproduct,desc&page=${page}`
+      )
       .then((res) => {
         dispatch(fetchProducts({ payload: res.data }));
         return res.data;
@@ -75,8 +84,8 @@ export const Products = () => {
   };
 
   useEffect(() => {
-    findProducts(currentPage - 1);
-  }, [currentPage, pageSize, offset]);
+    findProducts(productactive, currentPage - 1);
+  }, [currentPage, pageSize, offset, updates, productactive]);
 
   const handlePageChange = (nextPage) => {
     setCurrentPage(nextPage);
@@ -86,34 +95,67 @@ export const Products = () => {
     }
   };
 
+  const handleChangeActive = (active) => {
+    setProductactive(active);
+  };
+
+  const handleDeleteProduct = (idproduct) => {};
+
   return (
     <Flex flexDir={"column"} minW={"60%"}>
-      <Heading mb={8}> Products </Heading>
+      <Flex justifyContent={"space-between"}>
+        <Heading mb={8}> Produtos </Heading>
+        <Flex alignItems={"center"} justifyContent={"space-between"}>
+          <Select
+            mr={6}
+            maxW={28}
+            id="productactive"
+            onChange={(event) => {
+              handleChangeActive(event.target.value);
+            }}
+          >
+            <option value={true}> Ativos </option>
+            <option value={false}> Inativos </option>
+          </Select>
+          <CreateProduct
+            productUpdate={updates}
+            setProductUpdate={setUpdates}
+          />
+        </Flex>
+      </Flex>
       <TableContainer>
         <Table>
-          <TableCaption> Products </TableCaption>
+          <TableCaption> Produtos </TableCaption>
           <Thead>
             <Tr>
               <Th>Id</Th>
               <Th>Produto</Th>
               <Th>Categoria</Th>
               <Th>Descrição</Th>
+              <Th>Ações</Th>
             </Tr>
           </Thead>
-          {products.payload ? (
-            <Tbody>
-              {products.payload.content.map((product) => (
+          <Tbody>
+            {products.payload ? (
+              products.payload.content.map((product) => (
                 <Tr>
                   <Td>{product.idproduct}</Td>
                   <Td>{products.product}</Td>
                   <Td>{product.category}</Td>
                   <Td>{product.description}</Td>
+                  <Td></Td>
                 </Tr>
-              ))}
-            </Tbody>
-          ) : (
-            <Heading>Loading</Heading>
-          )}
+              ))
+            ) : (
+              <>
+                <Td>Loading</Td>
+                <Td>Loading</Td>
+                <Td>Loading</Td>
+                <Td>Loading</Td>
+                <Td>Loading</Td>
+              </>
+            )}
+          </Tbody>
         </Table>
       </TableContainer>
 

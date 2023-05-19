@@ -29,6 +29,8 @@ import {
   Td,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
+import { CreateRequest } from "../../components/Forms/CreateRequest";
+import { CreatePayment } from "../../components/Forms/CreatePayment";
 
 export const EditControl = () => {
   const { idcontrol } = useParams();
@@ -38,6 +40,7 @@ export const EditControl = () => {
   const [availableControls, setAvailableControls] = useState(null);
   const [payments, setPayments] = useState(null);
   const [control, setControl] = useState(null);
+
   const {
     handleSubmit,
     register,
@@ -58,7 +61,7 @@ export const EditControl = () => {
       });
 
     api
-      .get(`request/${id}`)
+      .get(`request/${id}?sort=idrequest,desc`)
       .then((res) => {
         setRequests(res.data);
       })
@@ -162,6 +165,57 @@ export const EditControl = () => {
           isClosable: true,
         });
       });
+  };
+
+  const handleRequestStatusChange = async (idrequest, status) => {
+    status !== 4
+      ? api
+          .put("request", {
+            idrequest,
+            requeststatus: status,
+          })
+          .then((res) => {
+            toast({
+              title: "Status Atualizado",
+              description: "Status do pedido atualizado com sucesso",
+              status: "success",
+              duration: 5000,
+              isClosable: true,
+            });
+
+            setUpdates(updates + 1);
+          })
+          .catch((err) => {
+            toast({
+              title: "Erro",
+              description: "Erro na atualização do pedido",
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+            });
+          })
+      : api
+          .delete(`request/${idrequest}`)
+          .then((res) => {
+            toast({
+              title: "Pedido cancelado",
+              description: "Pedido cancelado com sucesso",
+              status: "success",
+              duration: 5000,
+              isClosable: true,
+            });
+
+            setUpdates(updates + 1);
+          })
+          .catch((err) => {
+            toast({
+              title: "Erro",
+              description: "Erro no cancelamento do pedido",
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+            });
+          });
   };
 
   const handleDeleteControl = async (id) => {
@@ -344,79 +398,123 @@ export const EditControl = () => {
           pl={12}
           pt={12}
         >
-          <Heading as={"h3"} mb={8} fontSize={"1.5rem"}>
-            {" "}
-            Pedidos{" "}
-          </Heading>
-          <TableContainer mb={16}>
-            <Table>
-              <TableCaption> Requests </TableCaption>
-              <Thead>
-                <Tr>
-                  <Th>Id</Th>
-                  <Th>Produto</Th>
-                  <Th>status</Th>
-                  <Th isNumeric>Valor</Th>
-                </Tr>
-              </Thead>
-              {requests ? (
+          <Flex flexDir={"column"} mb={8}>
+            <Heading as={"h3"} mb={8} fontSize={"1.5rem"}>
+              {" "}
+              Pedidos{" "}
+            </Heading>
+            <TableContainer mb={4}>
+              <Table>
+                <TableCaption> Requests </TableCaption>
+                <Thead>
+                  <Tr>
+                    <Th>Id</Th>
+                    <Th>Produto</Th>
+                    <Th>status</Th>
+                    <Th isNumeric>Valor</Th>
+                  </Tr>
+                </Thead>
                 <Tbody>
-                  {requests.content.map((request) => (
+                  {requests ? (
+                    requests.content.map((request) => (
+                      <Tr key={request.idrequest}>
+                        <Td>{request.idrequest}</Td>
+                        <Td>{request.product}</Td>
+                        <Td>
+                          <Select
+                            w={36}
+                            onChange={(event) => {
+                              handleRequestStatusChange(
+                                request.idrequest,
+                                event.target.value
+                              );
+                            }}
+                          >
+                            {STATUSPEDIDOS.map((statuspedido) => {
+                              return STATUSPEDIDOS.indexOf(statuspedido) ===
+                                request.requeststatus ? (
+                                <option
+                                  key={STATUSPEDIDOS.indexOf(statuspedido)}
+                                  value={STATUSPEDIDOS.indexOf(statuspedido)}
+                                  selected
+                                >
+                                  {statuspedido}
+                                </option>
+                              ) : (
+                                <option
+                                  key={STATUSPEDIDOS.indexOf(statuspedido)}
+                                  value={STATUSPEDIDOS.indexOf(statuspedido)}
+                                >
+                                  {statuspedido}
+                                </option>
+                              );
+                            })}
+                          </Select>
+                        </Td>
+                        <Td isNumeric>R$ {request.vlvenda}</Td>
+                      </Tr>
+                    ))
+                  ) : (
                     <Tr>
-                      <Td>{request.idrequest}</Td>
-                      <Td>{request.product}</Td>
-                      <Td>{STATUSPEDIDOS[request.requeststatus]}</Td>
-                      <Td isNumeric>{request.vlvenda}</Td>
+                      <Td>Loading</Td>
+                      <Td>Loading</Td>
+                      <Td>Loading</Td>
+                      <Td>Loading</Td>
                     </Tr>
-                  ))}
+                  )}
                 </Tbody>
-              ) : (
-                <Tr>
-                  <Td>Loading</Td>
-                  <Td>Loading</Td>
-                  <Td>Loading</Td>
-                  <Td>Loading</Td>
-                </Tr>
-              )}
-            </Table>
-          </TableContainer>
+              </Table>
+            </TableContainer>
+            <CreateRequest
+              idcontrol={idcontrol}
+              requestUpdate={updates}
+              setRequestUpdate={setUpdates}
+            />
+          </Flex>
 
-          <Heading as={"h3"} fontSize={"1.5rem"} mb={8}>
-            Pagamentos
-          </Heading>
+          <Flex flexDir={"column"} mb={8}>
+            <Heading as={"h3"} fontSize={"1.5rem"} mb={8}>
+              Pagamentos
+            </Heading>
 
-          <TableContainer>
-            <Table>
-              <TableCaption> Pagamentos </TableCaption>
-              <Thead>
-                <Tr>
-                  <Th>Id</Th>
-                  <Th>Quantia</Th>
-                  <Th>Metodo</Th>
-                  <Th>Detalhes</Th>
-                </Tr>
-              </Thead>
-              {requests ? (
+            <TableContainer>
+              <Table>
+                <TableCaption> Pagamentos </TableCaption>
+                <Thead>
+                  <Tr>
+                    <Th>Id</Th>
+                    <Th>Quantia</Th>
+                    <Th>Metodo</Th>
+                    <Th>Detalhes</Th>
+                  </Tr>
+                </Thead>
                 <Tbody>
-                  {payments.content.map((payment) => (
+                  {requests ? (
+                    payments.content.map((payment) => (
+                      <Tr key={payment.idpayment}>
+                        <Td>{payment.idpayment}</Td>
+                        <Td>R$ {payment.amountpaid}</Td>
+                        <Td>{payment.paymentmethod}</Td>
+                        <Td isNumeric>{payment.paymentdetail}</Td>
+                      </Tr>
+                    ))
+                  ) : (
                     <Tr>
-                      <Td>{payment.idpayment}</Td>
-                      <Td>{payment.amountpaid}</Td>
-                      <Td>{payment.paymentmethod}</Td>
-                      <Td isNumeric>{payment.paymentdetail}</Td>
+                      <Td>Loading</Td>
+                      <Td>Loading</Td>
+                      <Td>Loading</Td>
+                      <Td>Loading</Td>
                     </Tr>
-                  ))}
+                  )}
                 </Tbody>
-              ) : (
-                <Tr>
-                  <Td>Loading</Td>
-                  <Td>Loading</Td>
-                  <Td>Loading</Td>
-                  <Td>Loading</Td>
-                </Tr>
-              )}
-            </Table>
-          </TableContainer>
+              </Table>
+            </TableContainer>
+            <CreatePayment
+              idcontrol={idcontrol}
+              paymentUpdate={updates}
+              setPaymentUpdate={setUpdates}
+            />
+          </Flex>
         </GridItem>
       </Grid>
     </>

@@ -10,6 +10,7 @@ import { Waiters } from "./pages/Waiters";
 import { Requests } from "./pages/Requests";
 import { InitialPage } from "./pages/InitialPage";
 import { EditControl } from "./pages/Controls/EditControl";
+import { EditProduct } from "./pages/Products/EditProduct";
 
 export const Router = () => {
   return (
@@ -19,6 +20,7 @@ export const Router = () => {
         <Route path="controls" element={<Controls />} />
         <Route path="controls/:idcontrol" element={<EditControl />} />
         <Route path="products" element={<Products />} />
+        <Route path="products/:idproducts" element={<EditProduct />} />
         <Route path="waiters" element={<Waiters />} />
         <Route path="categories" element={<Categories />} />
         <Route path="requests" element={<Requests />} />
