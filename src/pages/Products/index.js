@@ -15,6 +15,10 @@ import {
   MenuItem,
   Link,
   Select,
+  Menu,
+  MenuButton,
+  Button,
+  useToast,
 } from "@chakra-ui/react";
 
 import {
@@ -39,6 +43,7 @@ import { CreateProduct } from "../../components/Forms/CreateProduct";
 export const Products = () => {
   const dispatch = useDispatch();
   const products = useSelector((state) => state.products);
+  const toast = useToast();
   const [total, setTotal] = useState(18);
   const [updates, setUpdates] = useState(0);
   const [productactive, setProductactive] = useState(true);
@@ -99,7 +104,30 @@ export const Products = () => {
     setProductactive(active);
   };
 
-  const handleDeleteProduct = (idproduct) => {};
+  const handleDeleteProduct = async (idproduct) => {
+    api
+      .delete(`product/${idproduct}`)
+      .then((res) => {
+        toast({
+          title: "Desativado",
+          description: "Produto desativado com sucesso",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+
+        setUpdates(updates + 1);
+      })
+      .catch((err) => {
+        toast({
+          title: "Erro",
+          description: "Não foi possível desativar o produto",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      });
+  };
 
   return (
     <Flex flexDir={"column"} minW={"60%"}>
@@ -140,10 +168,27 @@ export const Products = () => {
               products.payload.content.map((product) => (
                 <Tr>
                   <Td>{product.idproduct}</Td>
-                  <Td>{products.product}</Td>
+                  <Td>{product.product}</Td>
                   <Td>{product.category}</Td>
                   <Td>{product.description}</Td>
-                  <Td></Td>
+                  <Td>
+                    <Menu>
+                      <MenuButton as={Button}> Ações </MenuButton>
+                      <MenuList>
+                        <Link href={`/products/${product.idproduct}`}>
+                          <MenuItem>Editar</MenuItem>
+                        </Link>
+
+                        <MenuItem
+                          onClick={() => {
+                            handleDeleteProduct(product.idproduct);
+                          }}
+                        >
+                          Desativar
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
+                  </Td>
                 </Tr>
               ))
             ) : (

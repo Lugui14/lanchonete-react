@@ -45,7 +45,7 @@ export const CreateRequest = ({
     api.defaults.headers.common.Authorization = localStorage.getItem("token");
 
     api
-      .get(`product?size=100`)
+      .get(`product/isactive=true?size=100`)
       .then((res) => {
         dispatch(fetchProducts(res.data));
       })

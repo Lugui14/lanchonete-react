@@ -27,6 +27,7 @@ import {
 import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
 
 import { useDispatch, useSelector } from "react-redux";
+import { CreateWaiter } from "../../components/Forms/CreateWaiter";
 import { signOut } from "../../store/reducers/logged";
 import { fetchWaiters } from "../../store/reducers/waiters";
 import { api } from "../../services/api";
@@ -35,6 +36,7 @@ export const Waiters = () => {
   const dispatch = useDispatch();
   const waiters = useSelector((state) => state.waiters);
   const [total, setTotal] = useState(18);
+  const [updates, setUpdates] = useState(0);
   const PAGESIZE = 6;
 
   // pagination hook
@@ -87,7 +89,10 @@ export const Waiters = () => {
 
   return (
     <Flex flexDir={"column"} minW={"60%"}>
-      <Heading mb={8}> Garçons </Heading>
+      <Flex justifyContent={"space-between"}>
+        <Heading mb={8}> Garçons </Heading>
+        <CreateWaiter waiterUpdate={updates} setWaiterUpdate={setUpdates} />
+      </Flex>
       <TableContainer>
         <Table>
           <TableCaption> Garçons </TableCaption>

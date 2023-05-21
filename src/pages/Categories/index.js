@@ -27,6 +27,7 @@ import {
 import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
 
 import { useDispatch, useSelector } from "react-redux";
+import { CreateCategory } from "../../components/Forms/CreateCategory"
 import { signOut } from "../../store/reducers/logged";
 import { fetchCategories } from "../../store/reducers/category";
 import { api } from "../../services/api";
@@ -35,6 +36,7 @@ export const Categories = () => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories);
   const [total, setTotal] = useState(18);
+  const [updates, setUpdates] = useState(0);
 
   const PAGESIZE = 6;
 
@@ -76,7 +78,7 @@ export const Categories = () => {
 
   useEffect(() => {
     findCategories(currentPage - 1);
-  }, [currentPage, pageSize, offset]);
+  }, [currentPage, pageSize, offset, updates]);
 
   const handlePageChange = (nextPage) => {
     setCurrentPage(nextPage);
@@ -88,7 +90,10 @@ export const Categories = () => {
 
   return (
     <Flex flexDir={"column"} minW={"60%"}>
+      <Flex justifyContent={'space-between'}>
       <Heading mb={8}> Categorias </Heading>
+      <CreateCategory categoryUpdate={updates} setCategoryUpdate={setUpdates} />
+      </Flex>
       <TableContainer>
         <Table>
           <TableCaption> Categorias </TableCaption>
@@ -97,21 +102,28 @@ export const Categories = () => {
               <Th>Id</Th>
               <Th>Categoria</Th>
               <Th>Descrição</Th>
+              <Th>Ações</Th>
             </Tr>
           </Thead>
+          <Tbody>
           {categories.payload ? (
-            <Tbody>
-              {categories.payload.content.map((category) => (
+              categories.payload.content.map((category) => (
                 <Tr>
                   <Td>{category.idcategory}</Td>
                   <Td>{category.category}</Td>
                   <Td>{category.description}</Td>
+                  <Td>Loading</Td>
                 </Tr>
-              ))}
-            </Tbody>
-          ) : (
-            <Heading>Loading</Heading>
-          )}
+              ))
+              ) : (
+                <Tr>
+                  <Td>Loading</Td>
+                  <Td>Loading</Td>
+                  <Td>Loading</Td>
+                  <Td>Loading</Td>
+                </Tr>
+                )}
+          </Tbody>
         </Table>
       </TableContainer>
 
