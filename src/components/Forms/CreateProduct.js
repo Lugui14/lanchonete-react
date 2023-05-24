@@ -42,7 +42,7 @@ export const CreateProduct = ({ productUpdate, setProductUpdate }) => {
     api.defaults.headers.common.Authorization = localStorage.getItem("token");
 
     api
-      .get(`category?size=100`)
+      .get(`category/isactive=true?size=100`)
       .then((res) => {
         dispatch(fetchCategories(res.data));
       })
@@ -128,16 +128,19 @@ export const CreateProduct = ({ productUpdate, setProductUpdate }) => {
 
                   <FormLabel htmlFor="idcategory">Categoria</FormLabel>
                   <Select
+                    onClick={() => {
+                      console.log(categories);
+                    }}
                     placeholder="Categoria do produto"
                     mb={8}
                     {...register("idcategory", {
                       required: "Esse campo é obrigatorio",
                     })}
                   >
-                    {!categories?.content ? (
+                    {!categories?.payload ? (
                       <option value={""}></option>
                     ) : (
-                      categories?.content.map((category) => (
+                      categories?.payload.content.map((category) => (
                         <option
                           key={category.idcategory}
                           value={category.idcategory}

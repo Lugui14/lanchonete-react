@@ -233,15 +233,15 @@ export const Controls = () => {
             {pages.map((page) => (
               <PaginationPage
                 w={7}
-                bg="gray.200"
+                bg="gray.400"
                 key={`pagination_page_${page}`}
                 page={page}
                 fontSize="sm"
                 _hover={{
-                  bg: "gray.300",
+                  bg: "gray.500",
                 }}
                 _current={{
-                  bg: "gray.400",
+                  bg: "gray.600",
                   fontSize: "sm",
                   w: 7,
                 }}

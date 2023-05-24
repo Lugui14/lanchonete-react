@@ -11,6 +11,13 @@ import {
   Td,
   Tbody,
   Text,
+  useToast,
+  Menu,
+  MenuButton,
+  Button,
+  Link,
+  MenuItem,
+  MenuList,
 } from "@chakra-ui/react";
 
 import {
@@ -34,6 +41,7 @@ import { api } from "../../services/api";
 
 export const Waiters = () => {
   const dispatch = useDispatch();
+  const toast = useToast();
   const waiters = useSelector((state) => state.waiters);
   const [total, setTotal] = useState(18);
   const [updates, setUpdates] = useState(0);
@@ -77,7 +85,7 @@ export const Waiters = () => {
 
   useEffect(() => {
     findWaiters(currentPage - 1);
-  }, [currentPage, pageSize, offset]);
+  }, [currentPage, pageSize, offset, updates]);
 
   const handlePageChange = (nextPage) => {
     setCurrentPage(nextPage);
@@ -85,6 +93,31 @@ export const Waiters = () => {
     if (nextPage !== currentPage) {
       nextPage >= currentPage ? setTotal(total + 6) : setTotal(total - 6);
     }
+  };
+
+  const handleDeleteWaiter = async (idwaiter) => {
+    api
+      .delete(`waiter/${idwaiter}`)
+      .then((res) => {
+        toast({
+          title: "Deletado",
+          description: "Garçom deletado com sucesso",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+
+        setUpdates(updates + 1);
+      })
+      .catch((err) => {
+        toast({
+          title: "Erro",
+          description: "Não foi possível deletar o garçom",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      });
   };
 
   return (
@@ -101,21 +134,44 @@ export const Waiters = () => {
               <Th>Id</Th>
               <Th>Nome</Th>
               <Th isNumeric>Salario</Th>
+              <Th isNumeric>Ações</Th>
             </Tr>
           </Thead>
-          {waiters.payload ? (
-            <Tbody>
-              {waiters.payload.content.map((waiter) => (
+          <Tbody>
+            {waiters.payload ? (
+              waiters.payload.content.map((waiter) => (
                 <Tr>
                   <Td>{waiter.idwaiter}</Td>
                   <Td>{waiter.waiter}</Td>
                   <Td isNumeric>R$ {waiter.salary}</Td>
+                  <Td isNumeric>
+                    <Menu>
+                      <MenuButton as={Button}> Ações </MenuButton>
+                      <MenuList>
+                        <Link href={`/waiters/${waiter.idwaiter}`}>
+                          <MenuItem>Editar</MenuItem>
+                        </Link>
+                        <MenuItem
+                          onClick={() => {
+                            handleDeleteWaiter(waiter.idwaiter);
+                          }}
+                        >
+                          Deletar
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
+                  </Td>
                 </Tr>
-              ))}
-            </Tbody>
-          ) : (
-            <Heading>Loading</Heading>
-          )}
+              ))
+            ) : (
+              <Tr>
+                <Td>Loading</Td>
+                <Td>Loading</Td>
+                <Td>Loading</Td>
+                <Td>Loading</Td>
+              </Tr>
+            )}
+          </Tbody>
         </Table>
       </TableContainer>
 
@@ -146,15 +202,15 @@ export const Waiters = () => {
             {pages.map((page) => (
               <PaginationPage
                 w={7}
-                bg="gray.200"
+                bg="gray.400"
                 key={`pagination_page_${page}`}
                 page={page}
                 fontSize="sm"
                 _hover={{
-                  bg: "gray.300",
+                  bg: "gray.500",
                 }}
                 _current={{
-                  bg: "gray.400",
+                  bg: "gray.600",
                   fontSize: "sm",
                   w: 7,
                 }}

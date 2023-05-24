@@ -20,6 +20,11 @@ import {
   InputGroup,
   InputLeftAddon,
   Textarea,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { api } from "../../services/api";
@@ -123,13 +128,20 @@ export const CreatePayment = ({
                   <FormLabel htmlFor="amountpaid">Quantia em reais</FormLabel>
                   <InputGroup mb={8}>
                     <InputLeftAddon children="R$" />
-                    <Input
-                      placeholder="Valor em R$"
-                      id="amountpaid"
-                      {...register("amountpaid", {
-                        required: "Esse campo é obrigatório",
-                      })}
-                    />
+                    <NumberInput min={0} step={0.1}>
+                      <NumberInputField
+                        borderLeftRadius={0}
+                        placeholder="Valor em R$"
+                        id="amountpaid"
+                        {...register("amountpaid", {
+                          required: "Esse campo é obrigatório",
+                        })}
+                      />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
                   </InputGroup>
 
                   <FormLabel htmlFor="idpaymentmethod">

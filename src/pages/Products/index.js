@@ -39,10 +39,12 @@ import { signOut } from "../../store/reducers/logged";
 import { fetchProducts } from "../../store/reducers/products";
 import { api } from "../../services/api";
 import { CreateProduct } from "../../components/Forms/CreateProduct";
+import { fetchCategories } from "../../store/reducers/category";
 
 export const Products = () => {
   const dispatch = useDispatch();
   const products = useSelector((state) => state.products);
+  const categories = useSelector((state) => state.categories);
   const toast = useToast();
   const [total, setTotal] = useState(18);
   const [updates, setUpdates] = useState(0);
@@ -75,7 +77,7 @@ export const Products = () => {
   const findProducts = async (isactive, page) => {
     api.defaults.headers.common.Authorization = localStorage.getItem("token");
 
-    await api
+    api
       .get(
         `product/isactive=${isactive}?size=${PAGESIZE}&sort=idproduct,desc&page=${page}`
       )
@@ -85,6 +87,21 @@ export const Products = () => {
       })
       .catch((err) => {
         dispatch(signOut());
+      });
+
+    api
+      .get(`category/isactive=true?size=100`)
+      .then((res) => {
+        dispatch(fetchCategories({ payload: res.data }));
+      })
+      .catch((err) => {
+        toast({
+          title: "Erro",
+          description: "Não foi possível recuperar categorias",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
       });
   };
 
@@ -100,8 +117,35 @@ export const Products = () => {
     }
   };
 
-  const handleChangeActive = (active) => {
-    setProductactive(active);
+  const handleActiveProduct = async (product) => {
+    api
+      .put(`product`, {
+        idproduct: product.idproduct,
+        isproductactive: true,
+        price: product.price,
+        idcategory: categories?.payload.content.find(
+          (category) => category.category === product.category
+        ).idcategory,
+      })
+      .then((res) => {
+        toast({
+          title: "Ativado",
+          description: "Produto Ativado com sucesso",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        setUpdates(updates + 1);
+      })
+      .catch((err) => {
+        toast({
+          title: "Erro",
+          description: "Produto não foi ativado",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      });
   };
 
   const handleDeleteProduct = async (idproduct) => {
@@ -139,7 +183,7 @@ export const Products = () => {
             maxW={28}
             id="productactive"
             onChange={(event) => {
-              handleChangeActive(event.target.value);
+              setProductactive(event.target.value);
             }}
           >
             <option value={true}> Ativos </option>
@@ -164,40 +208,61 @@ export const Products = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {products.payload ? (
-              products.payload.content.map((product) => (
-                <Tr>
-                  <Td>{product.idproduct}</Td>
-                  <Td>{product.product}</Td>
-                  <Td>{product.category}</Td>
-                  <Td>{product.description}</Td>
-                  <Td>
-                    <Menu>
-                      <MenuButton as={Button}> Ações </MenuButton>
-                      <MenuList>
-                        <Link href={`/products/${product.idproduct}`}>
-                          <MenuItem>Editar</MenuItem>
-                        </Link>
-
-                        <MenuItem
-                          onClick={() => {
-                            handleDeleteProduct(product.idproduct);
-                          }}
-                        >
-                          Desativar
-                        </MenuItem>
-                      </MenuList>
-                    </Menu>
-                  </Td>
-                </Tr>
-              ))
+            {products?.payload && categories?.payload ? (
+              products.payload.content.map((product) =>
+                categories.payload.content.find(
+                  (category) => category.category === product.category
+                ) ? (
+                  <>
+                    <Tr key={product.idproduct}>
+                      <Td>{product.idproduct}</Td>
+                      <Td>{product.product}</Td>
+                      <Td>{product.category}</Td>
+                      <Td>{product.description}</Td>
+                      <Td>
+                        <Menu>
+                          <MenuButton as={Button}> Ações </MenuButton>
+                          <MenuList>
+                            {product.isactive ? (
+                              <>
+                                <Link href={`/products/${product.idproduct}`}>
+                                  <MenuItem>Editar</MenuItem>
+                                </Link>
+                                <MenuItem
+                                  onClick={() => {
+                                    handleDeleteProduct(product.idproduct);
+                                  }}
+                                >
+                                  Desativar
+                                </MenuItem>
+                              </>
+                            ) : (
+                              <MenuItem
+                                onClick={() => {
+                                  handleActiveProduct(product);
+                                }}
+                              >
+                                Ativar
+                              </MenuItem>
+                            )}
+                          </MenuList>
+                        </Menu>
+                      </Td>
+                    </Tr>
+                  </>
+                ) : (
+                  <></>
+                )
+              )
             ) : (
               <>
-                <Td>Loading</Td>
-                <Td>Loading</Td>
-                <Td>Loading</Td>
-                <Td>Loading</Td>
-                <Td>Loading</Td>
+                <Tr>
+                  <Td>Loading</Td>
+                  <Td>Loading</Td>
+                  <Td>Loading</Td>
+                  <Td>Loading</Td>
+                  <Td>Loading</Td>
+                </Tr>
               </>
             )}
           </Tbody>
@@ -231,15 +296,15 @@ export const Products = () => {
             {pages.map((page) => (
               <PaginationPage
                 w={7}
-                bg="gray.200"
+                bg="gray.400"
                 key={`pagination_page_${page}`}
                 page={page}
                 fontSize="sm"
                 _hover={{
-                  bg: "gray.300",
+                  bg: "gray.500",
                 }}
                 _current={{
-                  bg: "gray.400",
+                  bg: "gray.600",
                   fontSize: "sm",
                   w: 7,
                 }}

@@ -11,6 +11,8 @@ import { Requests } from "./pages/Requests";
 import { InitialPage } from "./pages/InitialPage";
 import { EditControl } from "./pages/Controls/EditControl";
 import { EditProduct } from "./pages/Products/EditProduct";
+import { EditCategory } from "./pages/Categories/EditCategory";
+import { EditWaiter } from "./pages/Waiters/EditWaiter";
 
 export const Router = () => {
   return (
@@ -20,9 +22,11 @@ export const Router = () => {
         <Route path="controls" element={<Controls />} />
         <Route path="controls/:idcontrol" element={<EditControl />} />
         <Route path="products" element={<Products />} />
-        <Route path="products/:idproducts" element={<EditProduct />} />
+        <Route path="products/:idproduct" element={<EditProduct />} />
         <Route path="waiters" element={<Waiters />} />
+        <Route path="waiters/:idwaiter" element={<EditWaiter />} />
         <Route path="categories" element={<Categories />} />
+        <Route path="categories/:idcategory" element={<EditCategory />} />
         <Route path="requests" element={<Requests />} />
       </Route>
     </Routes>

@@ -33,7 +33,7 @@ export const CreateControl = ({ onCreateControl, controlCreated }) => {
     register,
     formState: { errors, isSubmitting },
   } = useForm();
-  
+
   const findComponents = async () => {
     api.defaults.headers.common.Authorization = localStorage.getItem("token");
 
@@ -67,7 +67,6 @@ export const CreateControl = ({ onCreateControl, controlCreated }) => {
         });
       });
   };
-
 
   const onsubmit = async ({ client, idwaiter, controlnumber }) => {
     api
@@ -178,7 +177,9 @@ export const CreateControl = ({ onCreateControl, controlCreated }) => {
                 </ModalBody>
                 <ModalFooter>
                   <FormErrorMessage>
-                    {errors.name && errors.name.message}
+                    {errors?.client?.message}
+                    {errors?.waiter?.message}
+                    {errors?.number?.message}
                   </FormErrorMessage>
 
                   <Button

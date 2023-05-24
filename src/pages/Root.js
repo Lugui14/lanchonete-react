@@ -11,26 +11,29 @@ export const Root = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    document.title = "LANCHONETE";
     dispatch(isLoginValid());
   }, [dispatch]);
 
   return (
-    <Flex w={"100vw"} h={"100vh"}>
-      {isLogged ? (
-        <Flex>
-          <Sidebar />
-          <Flex
-            w={"80vw"}
-            h={"100vh"}
-            alignItems={"center"}
-            justifyContent={"center"}
-          >
-            <Outlet />
+    <>
+      <Flex w={"100vw"} h={"100vh"}>
+        {isLogged ? (
+          <Flex>
+            <Sidebar />
+            <Flex
+              w={"80vw"}
+              h={"100vh"}
+              alignItems={"center"}
+              justifyContent={"center"}
+            >
+              <Outlet />
+            </Flex>
           </Flex>
-        </Flex>
-      ) : (
-        <LoginForm />
-      )}
-    </Flex>
+        ) : (
+          <LoginForm />
+        )}
+      </Flex>
+    </>
   );
 };
